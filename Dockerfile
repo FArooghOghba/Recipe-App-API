@@ -11,7 +11,9 @@ COPY ./core /app
 
 ARG DEV=false
 
-RUN python -m venv /py &&\
+RUN apt-get update && \
+    apt-get install --fix-missing -y gcc libpq-dev && \
+    python -m venv /py && \
     /py/bin/pip install --upgrade pip && \
     /py/bin/pip install -r requirements.txt && \
     if [ $DEV = "true" ]; \
