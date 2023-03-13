@@ -18,6 +18,9 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Checkout
         uses: actions/checkout@v3
+      - name: Build env File
+        run: |
+          echo "${{ secrets.BACKEND_ENV }}" > ./core/.env
       - name: Test
         run: docker-compose run --rm backend sh -c "python manage.py test"
       - name: Lint
