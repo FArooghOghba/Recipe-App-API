@@ -82,4 +82,3 @@ class ModelTest(TestCase):
                 email='test8@example.com', username='test_user123',
                 password='test123', is_superuser=False
             )
-
