@@ -2,12 +2,14 @@
 Serializers for the user API View.
 """
 
-from django.contrib.auth import get_user_model
+from django.contrib.auth import get_user_model, authenticate
+from django.utils.translation import gettext as _
 
 from rest_framework import serializers
+from rest_framework import status
 
 
-class UserSerializer(serializers.ModelSerializer):
+class UserModelSerializer(serializers.ModelSerializer):
     """Serializer for the user object."""
 
     class Meta:
@@ -23,3 +25,56 @@ class UserSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         """Create and return a user with encrypted password."""
         return get_user_model().objects.create_user(**validated_data)
+
+    def update(self, instance, validated_data):
+        """Update user data and return user."""
+
+        password = validated_data.pop('password', None)
+        user = super().update(instance, validated_data)
+
+        if password:
+            user.set_password(password)
+            user.save()
+
+        return user
+
+
+class AuthTokenSerializer(serializers.Serializer):
+    """Serializer for the user auth token."""
+
+    email = serializers.EmailField(write_only=True)
+    password = serializers.CharField(
+        style={'input_type': 'password'},
+        trim_whitespace=False,
+        write_only=True
+    )
+    token = serializers.CharField(read_only=True)
+
+    def validate(self, attrs):
+        """Validate and authenticate the user."""
+
+        email = attrs.get('email')
+        password = attrs.get('password')
+
+        if email and password:
+            user = authenticate(
+                request=self.context.get('request'),
+                username=email,
+                password=password
+            )
+
+            if not user:
+                msg = _("Unable to log in with provided credentials.")
+                raise serializers.ValidationError(msg, code='authorization')
+
+            if not user.is_verified:
+                raise serializers.ValidationError(
+                    {'verification': "user is not verified."},
+                    code=status.HTTP_400_BAD_REQUEST
+                )
+        else:
+            msg = _('Must include "username" and "password".')
+            raise serializers.ValidationError(msg, code="authorization")
+
+        attrs["user"] = user
+        return attrs
