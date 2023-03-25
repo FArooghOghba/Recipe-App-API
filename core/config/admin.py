@@ -6,10 +6,10 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.utils.translation import gettext_lazy as _
 
-from .models import User
+from config import models
 
 
-@admin.register(User)
+@admin.register(models.User)
 class UserAdmin(BaseUserAdmin):
     list_display = (
         'email', 'username', 'is_active',
@@ -52,3 +52,20 @@ class UserAdmin(BaseUserAdmin):
             )
         }),
     )
+
+
+@admin.register(models.Recipe)
+class RecipeAdmin(admin.ModelAdmin):
+    list_display = (
+        'title',
+        'make_time_minutes',
+        'price',
+    )
+    search_fields = (
+        'title__istartswith',
+        'make_time_minutes',
+        'price'
+    )
+    prepopulated_fields = {
+        'slug': ['title']
+    }

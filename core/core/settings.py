@@ -40,6 +40,7 @@ INSTALLED_APPS = [
 
     'config.apps.ConfigConfig',
     'user.apps.UserConfig',
+    'recipe.apps.RecipeConfig',
 
     'rest_framework',
     'rest_framework.authtoken',
