@@ -7,6 +7,10 @@ from django.contrib.auth import get_user_model
 from django.urls import reverse
 from django.test import Client
 
+from config.models import Recipe
+
+from decimal import Decimal
+
 
 class AdminSiteTest(TestCase):
     """Tests for Django site admin."""
@@ -25,6 +29,15 @@ class AdminSiteTest(TestCase):
             username='UserTest',
             password='test_pass123'
         )
+
+        defaults = {
+            'title': 'Sample Test Recipe Title',
+            'description': 'sample test recipe description.',
+            'make_time_minutes': 22,
+            'price': Decimal('5.25'),
+            'link': 'https://example.com/recipe.pdf'
+        }
+        self.recipe = Recipe.objects.create(user=self.user, **defaults)
 
     def test_users_list(self):
         """Test that users are listed on page."""
@@ -50,3 +63,14 @@ class AdminSiteTest(TestCase):
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, 200)
+
+    def test_recipes_list(self):
+        """Test that recipes are listed on page."""
+
+        url = reverse('admin:config_recipe_changelist')
+        response = self.client.get(url)
+
+        self.assertContains(response, self.recipe.user)
+        self.assertContains(response, self.recipe.title)
+        self.assertContains(response, self.recipe.make_time_minutes)
+        self.assertContains(response, self.recipe.price)

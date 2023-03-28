@@ -57,6 +57,7 @@ class UserAdmin(BaseUserAdmin):
 @admin.register(models.Recipe)
 class RecipeAdmin(admin.ModelAdmin):
     list_display = (
+        'user',
         'title',
         'make_time_minutes',
         'price',
