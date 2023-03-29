@@ -4,7 +4,7 @@ Serializers for the user API View.
 
 from rest_framework import serializers
 
-from config.models import Recipe
+from config.models import Recipe, Tag
 
 
 class RecipeModelSerializer(serializers.ModelSerializer):
@@ -27,3 +27,12 @@ class RecipeDetailModelSerializer(RecipeModelSerializer):
 
     class Meta(RecipeModelSerializer.Meta):
         fields = RecipeModelSerializer.Meta.fields + ['description']
+
+
+class TagModelSerializer(serializers.ModelSerializer):
+    """Serializer for the tag object."""
+
+    class Meta:
+        model = Tag
+        fields = ('id', 'name')
+        read_only_fields = ('id',)
