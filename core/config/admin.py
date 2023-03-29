@@ -70,3 +70,12 @@ class RecipeAdmin(admin.ModelAdmin):
     prepopulated_fields = {
         'slug': ['title']
     }
+
+
+@admin.register(models.Tag)
+class TagAdmin(admin.ModelAdmin):
+    list_display = (
+        'user',
+        'name'
+    )
+    search_fields = ('user', 'name__istartswith')

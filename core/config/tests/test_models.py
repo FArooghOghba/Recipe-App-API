@@ -10,6 +10,16 @@ from django.contrib.auth import get_user_model
 from config import models
 
 
+def create_user():
+    """Create and return a user."""
+
+    return get_user_model().objects.create_user(
+        email='test@example.com',
+        username='test_user',
+        password='test_pass123'
+    )
+
+
 class ModelTest(TestCase):
     """Test models."""
 
@@ -90,11 +100,7 @@ class ModelTest(TestCase):
     def test_create_recipe_successful(self):
         """Test create a recipe is successful."""
 
-        user = get_user_model().objects.create_user(
-            email='test@example.com',
-            username='test_user',
-            password='test_pass123'
-        )
+        user = create_user()
 
         recipe = models.Recipe.objects.create(
             user=user,
@@ -105,3 +111,11 @@ class ModelTest(TestCase):
         )
 
         self.assertEqual(recipe.title, str(recipe))
+
+    def test_tag_create_success(self):
+        """Test creating a tag is successful."""
+
+        user = create_user()
+        tag = models.Tag.objects.create(user=user, name='test_tag')
+
+        self.assertEqual(tag.name, str(tag))
