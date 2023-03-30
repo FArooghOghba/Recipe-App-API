@@ -43,7 +43,9 @@ class RecipeModelViewSet(viewsets.ModelViewSet):
         serializer.save(user=self.request.user)
 
 
-class TagGenericViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
+class TagGenericViewSet(
+        mixins.UpdateModelMixin, mixins.ListModelMixin, viewsets.GenericViewSet
+):
     """Retrieve tags for specifics authenticated user."""
 
     serializer_class = TagModelSerializer
