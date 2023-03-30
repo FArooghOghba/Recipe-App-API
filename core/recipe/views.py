@@ -44,7 +44,10 @@ class RecipeModelViewSet(viewsets.ModelViewSet):
 
 
 class TagGenericViewSet(
-        mixins.UpdateModelMixin, mixins.ListModelMixin, viewsets.GenericViewSet
+        mixins.DestroyModelMixin,
+        mixins.UpdateModelMixin,
+        mixins.ListModelMixin,
+        viewsets.GenericViewSet
 ):
     """Retrieve tags for specifics authenticated user."""
 
