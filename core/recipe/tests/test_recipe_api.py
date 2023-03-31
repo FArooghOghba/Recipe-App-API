@@ -243,7 +243,10 @@ class PrivateRecipeAPITests(TestCase):
         self.assertTrue(Recipe.objects.filter(id=recipe.id).exists())
 
     def test_recipe_post_for_create_with_new_tags_successful(self):
-        """Test creating recipe with nested serializer new tags is successful."""
+        """
+        Test creating recipe with nested serializer new tags is successful.
+        :return:
+        """
 
         payload = {
             'title': 'Sample Test Recipe Title',
@@ -256,7 +259,9 @@ class PrivateRecipeAPITests(TestCase):
             ],
             'link': 'https://example.com/recipe.pdf'
         }
-        response = self.client.post(path=RECIPE_URL, data=payload, format='json')
+        response = self.client.post(
+            path=RECIPE_URL, data=payload, format='json'
+        )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
         recipes = Recipe.objects.filter(user=self.user)
@@ -273,7 +278,11 @@ class PrivateRecipeAPITests(TestCase):
             self.assertTrue(tag_exists)
 
     def test_recipe_post_for_create_with_existing_tags_successful(self):
-        """Test creating recipe with nested serializer existing tags is successful."""
+        """
+        Test creating recipe with nested serializer existing tags
+         is successful.
+        :return:
+        """
 
         tag = Tag.objects.create(user=self.user, name='tag_test_name1')
         payload = {
@@ -287,7 +296,9 @@ class PrivateRecipeAPITests(TestCase):
             ],
             'link': 'https://example.com/recipe.pdf'
         }
-        response = self.client.post(path=RECIPE_URL, data=payload, format='json')
+        response = self.client.post(
+            path=RECIPE_URL, data=payload, format='json'
+        )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
         recipes = Recipe.objects.filter(user=self.user)
