@@ -314,3 +314,67 @@ class PrivateRecipeAPITests(TestCase):
                 name=tag['name']
             ).exists()
             self.assertTrue(tag_exists)
+
+    def test_recipe_update_patch_for_create_tag_successful(self):
+        """Test updating recipe for creating tag is successful."""
+
+        recipe = create_recipe(user=self.user)
+
+        url = recipe_detail_url(recipe_id=recipe.id)
+        payload = {
+            'tag': [
+                {'name': 'tag_test_name'}
+            ]
+        }
+        response = self.client.patch(path=url, data=payload, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        new_tag = Tag.objects.get(user=self.user, name='tag_test_name')
+        self.assertIn(new_tag, recipe.tag.all())
+
+    def test_recipe_update_patch_for_assign_existing_tag_successful(self):
+        """
+        Test assigning an existing tag when updating a recipe. successful.
+        :return:
+        """
+
+        tag_test_1 = Tag.objects.create(
+            user=self.user, name='tag_test_name_1'
+        )
+        recipe = create_recipe(user=self.user)
+        recipe.tag.add(tag_test_1)
+
+        tag_test_2 = Tag.objects.create(
+            user=self.user, name='tag_test_name_2'
+        )
+
+        url = recipe_detail_url(recipe_id=recipe.id)
+        payload = {
+            'tag': [
+                {'name': 'tag_test_name_2'}
+            ]
+        }
+        response = self.client.patch(path=url, data=payload, format='json')
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn(tag_test_2, recipe.tag.all())
+        self.assertNotIn(tag_test_1, recipe.tag.all())
+
+    def test_recipe_update_patch_for_clear_tag_successful(self):
+        """Test updating recipe for clear tags is successful."""
+
+        tag = Tag.objects.create(
+            user=self.user, name='tag_test_name'
+        )
+        recipe = create_recipe(user=self.user)
+        recipe.tag.add(tag)
+
+        url = recipe_detail_url(recipe_id=recipe.id)
+        payload = {
+            'tag': []
+        }
+        response = self.client.patch(path=url, data=payload, format='json')
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(recipe.tag.count(), 0)
+        self.assertNotIn(tag, recipe.tag.all())
