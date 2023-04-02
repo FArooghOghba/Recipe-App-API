@@ -82,7 +82,7 @@ class TagAdmin(admin.ModelAdmin):
 
 
 @admin.register(models.Ingredient)
-class TagAdmin(admin.ModelAdmin):
+class IngredientAdmin(admin.ModelAdmin):
     list_display = (
         'user',
         'name'
