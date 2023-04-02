@@ -79,3 +79,12 @@ class TagAdmin(admin.ModelAdmin):
         'name'
     )
     search_fields = ('user', 'name__istartswith')
+
+
+@admin.register(models.Ingredient)
+class TagAdmin(admin.ModelAdmin):
+    list_display = (
+        'user',
+        'name'
+    )
+    search_fields = ('user', 'name__istartswith')
