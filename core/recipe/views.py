@@ -44,43 +44,33 @@ class RecipeModelViewSet(viewsets.ModelViewSet):
         serializer.save(user=self.request.user)
 
 
-class TagGenericViewSet(
+class BaseRecipeAttrGenericViewSet(
         mixins.DestroyModelMixin,
         mixins.UpdateModelMixin,
         mixins.ListModelMixin,
         viewsets.GenericViewSet
 ):
+    """Base view set for recipe attributes."""
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        """Filter queryset to authenticated user."""
+
+        return self.queryset.filter(
+            user=self.request.user
+        ).order_by('-name')
+
+
+class TagGenericViewSet(BaseRecipeAttrGenericViewSet):
     """Retrieve tags for specifics authenticated user."""
 
     serializer_class = TagModelSerializer
     queryset = Tag.objects.all()
-    authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticated]
-
-    def get_queryset(self):
-        """Filter queryset to authenticated user."""
-
-        return self.queryset.filter(
-            user=self.request.user
-        ).order_by('-name')
 
 
-class IngredientGenericViewSet(
-        mixins.DestroyModelMixin,
-        mixins.UpdateModelMixin,
-        mixins.ListModelMixin,
-        viewsets.GenericViewSet
-):
+class IngredientGenericViewSet(BaseRecipeAttrGenericViewSet):
     """Retrieve ingredients for specifics authenticated user."""
 
     serializer_class = IngredientModelSerializer
     queryset = Ingredient.objects.all()
-    authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticated]
-
-    def get_queryset(self):
-        """Filter queryset to authenticated user."""
-
-        return self.queryset.filter(
-            user=self.request.user
-        ).order_by('-name')
