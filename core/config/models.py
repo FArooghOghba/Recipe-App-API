@@ -8,6 +8,17 @@ from django.contrib.auth.models import (
     BaseUserManager
 )
 
+import uuid
+import os
+
+
+def recipe_image_file_path(instance, filename):
+    """Generate file path for new recipe image."""
+    extension = os.path.splitext(filename)[1]
+    filename = f'{uuid.uuid4()}{extension}'
+
+    return os.path.join('uploads', 'recipe', filename)
+
 
 class UserManager(BaseUserManager):
     """
@@ -91,6 +102,7 @@ class Recipe(models.Model):
     )
     slug = models.SlugField()
     title = models.CharField(max_length=255)
+    image = models.ImageField(upload_to=recipe_image_file_path, null=True)
     description = models.TextField(blank=True)
     make_time_minutes = models.IntegerField()
     price = models.DecimalField(max_digits=5, decimal_places=2)
