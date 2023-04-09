@@ -8,6 +8,13 @@ from rest_framework.response import Response
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 
+from drf_spectacular.utils import (
+    extend_schema,
+    extend_schema_view,
+    OpenApiParameter,
+    OpenApiTypes
+)
+
 from config.models import Recipe, Tag, Ingredient
 from recipe.serializers import (
     RecipeModelSerializer,
@@ -18,6 +25,22 @@ from recipe.serializers import (
 )
 
 
+@extend_schema_view(
+    list=extend_schema(
+        parameters=[
+            OpenApiParameter(
+                'tags',
+                OpenApiTypes.STR,
+                description='Comma separated list of tag IDs to filter.'
+            ),
+            OpenApiParameter(
+                'ingredients',
+                OpenApiTypes.STR,
+                description='Comma separated list of ingredients IDs to filter.'
+            )
+        ]
+    )
+)
 class RecipeModelViewSet(viewsets.ModelViewSet):
     """View for manage recipe APIs."""
 
@@ -26,12 +49,26 @@ class RecipeModelViewSet(viewsets.ModelViewSet):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
 
+    def _params_to_int(self, params):
+        """Convert a list params string to int."""
+        return [int(str_id) for str_id in params.split(',')]
+
     def get_queryset(self):
         """Retrieve recipes for specifics authenticated user."""
+        tags = self.request.query_params.get('tags')
+        ingredients = self.request.query_params.get('ingredients')
+        queryset = self.queryset
 
-        return self.queryset.filter(
+        if tags:
+            tag_ids = self._params_to_int(tags)
+            queryset = queryset.filter(tag__id__in=tag_ids)
+        if ingredients:
+            ingredient_ids = self._params_to_int(ingredients)
+            queryset = queryset.filter(ingredients__id__in=ingredient_ids)
+
+        return queryset.filter(
             user=self.request.user
-        ).order_by('-id')
+        ).order_by('-id').distinct()
 
     def get_serializer_class(self):
         """Return the serializer class for request."""

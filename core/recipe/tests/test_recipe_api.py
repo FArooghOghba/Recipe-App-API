@@ -532,6 +532,70 @@ class PrivateRecipeAPITests(TestCase):
         self.assertEqual(recipe.ingredients.count(), 0)
         self.assertNotIn(ingredient, recipe.ingredients.all())
 
+    def test_recipe_filter_by_tags(self):
+        """Test filtering recipe by tags."""
+
+        recipe1 = create_recipe(
+            user=self.user, title='recipe test 1 title'
+        )
+        recipe2 = create_recipe(
+            user=self.user, title='recipe test 2 title'
+        )
+        tag1 = Tag.objects.create(user=self.user, name='tag test 1')
+        tag2 = Tag.objects.create(user=self.user, name='tag test 2')
+
+        recipe1.tag.add(tag1)
+        recipe2.tag.add(tag2)
+
+        recipe3 = create_recipe(
+            user=self.user, title='recipe test 3 title'
+        )
+
+        params = {'tags': f'{tag1.id},{tag2.id}'}
+        response = self.client.get(RECIPE_URL, params)
+
+        serializer1 = RecipeModelSerializer(recipe1)
+        serializer2 = RecipeModelSerializer(recipe2)
+        serializer3 = RecipeModelSerializer(recipe3)
+
+        self.assertIn(serializer1.data, response.data)
+        self.assertIn(serializer2.data, response.data)
+        self.assertNotIn(serializer3.data, response.data)
+
+    def test_recipe_filter_by_ingredients(self):
+        """Test filtering recipe by ingredients."""
+
+        recipe1 = create_recipe(
+            user=self.user, title='recipe test 1 title'
+        )
+        recipe2 = create_recipe(
+            user=self.user, title='recipe test 2 title'
+        )
+        ingredient1 = Ingredient.objects.create(
+            user=self.user, name='ingredient test 1'
+        )
+        ingredient2 = Ingredient.objects.create(
+            user=self.user, name='ingredient test 2'
+        )
+
+        recipe1.ingredients.add(ingredient1)
+        recipe2.ingredients.add(ingredient2)
+
+        recipe3 = create_recipe(
+            user=self.user, title='recipe test 3 title'
+        )
+
+        params = {'ingredients': f'{ingredient1.id},{ingredient2.id}'}
+        response = self.client.get(RECIPE_URL, params)
+
+        serializer1 = RecipeModelSerializer(recipe1)
+        serializer2 = RecipeModelSerializer(recipe2)
+        serializer3 = RecipeModelSerializer(recipe3)
+
+        self.assertIn(serializer1.data, response.data)
+        self.assertIn(serializer2.data, response.data)
+        self.assertNotIn(serializer3.data, response.data)
+
 
 class ImageUploadTests(TestCase):
     """Tests for the recipe image upload API."""
