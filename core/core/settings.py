@@ -148,3 +148,10 @@ AUTH_USER_MODEL = 'config.User'
 REST_FRAMEWORK = {
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
+
+
+# Setting to Upload Image Through Browsable API
+
+SPECTACULAR_SETTINGS = {
+    'COMPONENT_SPLIT_REQUEST': True
+}
