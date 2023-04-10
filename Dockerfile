@@ -26,7 +26,7 @@ RUN apt-get update && \
     mkdir -p /vol/web/media && \
     mkdir -p /vol/web/static && \
     chown -R django-user:django-user /vol && \
-    chmod -R 755 /vol
+    chmod -R 777 /vol
 
 ENV PATH="/py/bin:$PATH"
 
